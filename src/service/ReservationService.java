@@ -12,13 +12,14 @@ public class ReservationService {
     // Reference: https://www.baeldung.com/java-singleton
     private static ReservationService INSTANCE;
     private final Map<String, IRoom> rooms = new HashMap<>();
-    private final Map<String, Collection<Reservation>> reservations = new HashMap<>();
+    private final Map<String, Collection<Reservation>> reservations = new HashMap<>(); // key: customer E-mail
 
-    private ReservationService() {}
+    private ReservationService() {
+    }
 
     // Returns the singleton service instance.
     public static ReservationService getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             INSTANCE = new ReservationService();
         }
         return INSTANCE;
@@ -47,9 +48,9 @@ public class ReservationService {
     /**
      * Record a new reservation with the given info
      *
-     * @param customer : customer who tries to book a room
-     * @param room : iRoom to book
-     * @param checkInDate : check-in date
+     * @param customer     : customer who tries to book a room
+     * @param room         : iRoom to book
+     * @param checkInDate  : check-in date
      * @param checkOutDate : check-out date
      * @return : newly created reservation transaction
      */
@@ -89,7 +90,7 @@ public class ReservationService {
     /**
      * Get all the available rooms for a given dates
      *
-     * @param checkInDate : check-in date
+     * @param checkInDate  : check-in date
      * @param checkOutDate : check-out date
      * @return : collection of all rooms available on the given period
      */
@@ -97,12 +98,20 @@ public class ReservationService {
         // Copy all rooms
         Map<String, IRoom> availableRooms = new HashMap<>(rooms);
 
+        ArrayList<Reservation> allReservations = new ArrayList<>();
+        // Put all the reservations from the Hashmap 'reservations'
+        for (Collection<Reservation> reservations : reservations.values()) {
+            allReservations.add((Reservation) reservations);
+        }
+
         // Compare given dates with reservations
-        for (Reservation reservation: reservations) {
-            // Reference : https://www.geeksforgeeks.org/calendar-before-method-in-java/?ref=rp
-            if(reservation.getCheckInDate().before(checkOutDate) && reservation.getCheckOutDate().after(checkOutDate)) {
-                // Delete an unavailable room from all available rooms
-                availableRooms.remove(reservation.getRoom().getRoomNumber());
+        // Reference : https://www.geeksforgeeks.org/calendar-before-method-in-java/?ref=rp
+
+        // Delete an unavailable room from all available rooms
+        for (Reservation reservation: allReservations) {
+            if (reservation.getCheckInDate().before(checkInDate) && reservation.getCheckOutDate().after(checkOutDate)) {
+                Object roomNumber = reservation.getRoom().getRoomNumber();
+                availableRooms.remove(roomNumber);
             }
         }
         return availableRooms.values();
