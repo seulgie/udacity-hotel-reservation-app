@@ -2,6 +2,7 @@ package api;
 
 import model.*;
 import service.*;
+
 import java.util.*;
 
 /**
@@ -10,18 +11,16 @@ import java.util.*;
 
 public class HotelResource {
 
-    // Provide a static reference
+    // Reference: https://www.baeldung.com/java-singleton
     private static HotelResource INSTANCE;
 
-    private final CustomerService customerService = CustomerService.getInstance();
-    private final ReservationService reservationService = ReservationService.getInstance();
+    private static final CustomerService customerService = CustomerService.getInstance();
+    private static final ReservationService reservationService = ReservationService.getInstance();
 
     private HotelResource() {}
 
     public static HotelResource getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new HotelResource();
-        }
+        if(INSTANCE == null) INSTANCE = new HotelResource();
         return INSTANCE;
     }
 
@@ -31,7 +30,7 @@ public class HotelResource {
      * @param email of the customer
      * @return customer info of that email
      */
-    public Customer getCustomer(String email) {
+    public static Customer getCustomer(String email) {
         return customerService.getCustomer(email);
     }
 
@@ -42,7 +41,7 @@ public class HotelResource {
      * @param firstName : customer first name
      * @param lastName : customer last name
      */
-    public void createCustomer(String email, String firstName, String lastName) {
+    public static void createCustomer(String email, String firstName, String lastName) {
         customerService.addCustomer(email, firstName, lastName);
 
     }
@@ -53,7 +52,7 @@ public class HotelResource {
      * @param roomNumber : the room number
      * @return iRoom of that room number
      */
-    public IRoom getRoom(String roomNumber) {
+    public static IRoom getRoom(String roomNumber) {
         return reservationService.getARoom(roomNumber);
     }
 
@@ -66,7 +65,7 @@ public class HotelResource {
      * @param checkOutDate : check-out date
      * @return : booked reservation info
      */
-    public Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
+    public static Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
         return reservationService.reserveARoom(getCustomer(customerEmail), room, checkInDate, checkOutDate);
     }
 
@@ -76,7 +75,7 @@ public class HotelResource {
      * @param customerEmail : customer email who booked before
      * @return collections of all the recorded reservations of that customer
      */
-    public Collection<Reservation> getCustomerReservations(String customerEmail) {
+    public static Collection<Reservation> getCustomerReservations(String customerEmail) {
         Customer customer = getCustomer(customerEmail);
         return reservationService.getCustomersReservation(customer);
     }
@@ -84,11 +83,11 @@ public class HotelResource {
     /**
      * Check all available rooms for the given period
      *
-     * @param checkIn
-     * @param checkOut
-     * @return
+     * @param checkIn : check-in date
+     * @param checkOut : check-out date
+     * @return : available rooms from the given period
      */
-    public Collection<IRoom> findARoom(Date checkIn, Date checkOut) {
+    public static Collection<IRoom> findARoom(Date checkIn, Date checkOut) {
         return reservationService.findRooms(checkIn, checkOut);
     }
 }
